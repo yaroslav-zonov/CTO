@@ -1,0 +1,33 @@
+"id","name","description","icon","version","dleversion","versioncompare","active","mysqlinstall","mysqlupgrade","mysqlenable","mysqldisable","mysqldelete","filedelete","filelist","upgradeurl","needplugin","phpinstall","phpupgrade","phpenable","phpdisable","phpdelete","notice","mnotice","posi"
+1,XCats - дополнительные поля категорий,Разработано в New-Dev.ru (платные и бесплатные модули для DLE) &lt;newdevexpert@gmail.com&gt;,engine/modules/xcats/xcats.png,"1.0.1","13.0",>=,0,"INSERT INTO `{prefix}_admin_sections` (`name`, `title`, `descr`, `icon`, `allow_groups`) VALUES ('XCats', 'XCats - доп. поля категорий', 'Дополнительные поля для категорий', 'xcats.png', '1');
+		
+		ALTER TABLE `{prefix}_category` ADD `xfields` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';","","","","DELETE FROM `{prefix}_admin_sections` WHERE name='XCats';
+		
+		ALTER TABLE `{prefix}_category` DROP `xfields`;",0,"","","","","","","","","",0,1
+6,RandomAjaxPosts,"Вставка кода в файлы: engine/modules/main.php, engine/engine.php для модуля RandomAjaxPosts. Разработано в New-Dev.ru (модули для DLE) &lt;newdevexpert@gmail.com&gt;","","","","",1,"","","","","",0,"","","","","","","","","",0,1
+7,[KS] EXIM,"Экспорт / импорт новостей на сайте.
++ работа с плагином Kylshop (если установлен)",engine/skins/images/exim.png,"2.0","10.0",>=,1,"INSERT INTO `{prefix}_admin_sections` (`name`, `title`, `descr`, `icon`, `allow_groups`) VALUES ('exim', 'Экспорт / импорт новостей', 'Экспорт / импорт новостей на сайте + работа с плагином Kylshop (если установлен)', 'exim.png', '1');","","","",DELETE FROM `{prefix}_admin_sections` WHERE `name` = 'exim';,0,"","","","","","","","","",0,1
+9,Fullstory-Metatags by Sander,"Управление метатегами полной новости
+@author Sander &lt;oleg.sandev@gmail.com&gt;
+@link https://sandev.pro/web/159-fullstory-metatags-by-sander.html","","","",<=,1,"","","","","",0,"","","","","","","","","В fullstory.tpl использовать запись вида:
+[metatags]
+<title></title>
+<description></description>
+<keywords></keywords>
+<og:title></og:title>
+<og:любой-тег></og:любой-тег>
+<robots>noindex,follow</robots>
+[/metatags]
+
+Примечание по <robots>
+Полноценная работа тега robots поддерживается только начиная с DLE 13.3
+Для более ранних версий можно только заблокировать доступ ботам, для этого достаточно прописать любое из значений: false, no, off, 0
+Если в настройках новости включено блокирование, то любое значение модуля будет проигнорировано.",0,1
+10,Хостинг картинок imgbb,"",engine/skins/images/scrin.png,"1.0","15",>=,1,"INSERT INTO `{prefix}_admin_sections` (`name`, `title`, `descr`, `icon`, `allow_groups`) VALUES
+('scrin', 'Хостинг картинок imgbb', 'Загрузка картинок на хостинг imgbb из новости.', 'engine/skins/images/scrin.png', '1');
+
+ALTER TABLE `{prefix}_post` ADD `scrin` mediumtext NOT NULL DEFAULT '';","","","","DELETE FROM `{prefix}_admin_sections` WHERE name='scrin';
+
+ALTER TABLE `{prefix}_post`
+  DROP `scrin`;",0,"","","","","","","","","",0,1
+11,Плагин для модуля XCats. Разработано в New-Dev.ru,"Вставки в: engine/ajax/adminfunction.php, engine/classes/templates.class.php, engine/inc/categories.php, engine/inc/help.php",engine/skins/images/xcats.png,"","","",1,"","","","","",0,"","","","","","","","","",0,1

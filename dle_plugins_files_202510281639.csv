@@ -1,0 +1,86 @@
+"id","plugin_id","file","action","searchcode","replacecode","active","searchcount","replacecount","filedisable","filedleversion","fileversioncompare"
+16,1,engine/ajax/adminfunction.php,before,echo $buffer;,require_once DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/ajax_adminfunction.php');,0,0,0,1,"",""
+17,1,engine/classes/templates.class.php,before,"if (strpos ( $this->template, ""{catmenu"" ) !== false) {",require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/xcats.php');,0,0,0,1,"",""
+18,1,engine/classes/templates.class.php,before,"if (strpos ( $template, ""{catnewscount"" ) !== false) {",require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/xcats.php');,0,0,0,1,"",""
+19,1,engine/classes/templates.class.php,after,$category = intval($category_id);,require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/xcats.php');,0,0,0,1,"",""
+20,1,engine/inc/categories.php,before,"$db->query( ""INSERT INTO "" . USERPREFIX . ""_admin_logs (name, date, ip, action, extras) values ('"".$db->safesql($member_id['name']).""', '{$_TIME}', '{$_IP}', '12', '{$cat_name}')"" );",require_once DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/category_action.php');,0,0,0,1,"",""
+21,1,engine/inc/categories.php,after,"$row['fulldescr'] = $parse->decodeBBCodes( $row['fulldescr'], false );",require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/edit_category.php');,0,0,0,1,"",""
+22,1,engine/inc/categories.php,after,"$db->query( ""INSERT INTO "" . USERPREFIX . ""_admin_logs (name, date, ip, action, extras) values ('"".$db->safesql($member_id['name']).""', '{$_TIME}', '{$_IP}', '14', '{$cat_name}')"" );",require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/category_action.php');,0,0,0,1,"",""
+23,1,engine/inc/categories.php,after,$skinlist = SelectSkin( '' );,require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/add_category.php');,0,0,0,1,"",""
+24,1,engine/inc/categories.php,before,"</div> <div class=""panel-footer""> <button type=""submit"" ",{$output},0,0,0,1,"",""
+25,1,engine/inc/categories.php,before,"</div> <div class=""modal-footer"" style=""margin-top:-20px;""> <button type=""submit"" ",{$output},0,0,0,1,"",""
+26,1,engine/inc/help.php,before,if ( file_exists( DLEPlugins::Check(ROOT_DIR . '/language/' . $selected_language . '/help.lng' )) ) {,require_once DLEPlugins::Check(ENGINE_DIR . '/modules/xcats/admin/includes/ajax_help.php');,0,0,0,1,"",""
+44,6,engine/modules/main.php,after,$tpl->compile ( 'main' );,require ENGINE_DIR.'/modules/randomajaxposts/site/includes/main.php';,1,0,0,1,"",""
+45,6,engine/engine.php,before,"if( $not_allow_cats[0] != """" ) {",require ENGINE_DIR.'/modules/randomajaxposts/site/includes/engine_top.php';,1,0,0,1,"",""
+46,6,engine/engine.php,before,} } elseif ($do == 'lastnews') {,require ENGINE_DIR.'/modules/randomajaxposts/site/includes/engine_category.php';,1,0,0,1,"",""
+47,6,engine/engine.php,before,} elseif ($subaction == 'userinfo') { // ################,require ENGINE_DIR.'/modules/randomajaxposts/site/includes/engine_xfsearch.php';,1,0,0,1,"",""
+75,9,engine/modules/show.full.php,before,"if (stripos ( $tpl->result['content'], ""[hide"" ) !== false ) {","////////////////////////////////////////////////////////////////////////////////////////////////
+		include_once (DLEPlugins::Check(ENGINE_DIR . '/mods/fullstory.metatags.php'));
+////////////////////////////////////////////////////////////////////////////////////////////////",1,0,0,1,"",""
+76,9,engine/mods/fullstory.metatags.php,create,"","<?php
+/**
+ * Управление метатегами и разметкой OpenGraph на странице полной новости
+ * @author Sandev <oleg.sandev@gmail.com>
+ * @link https://sandev.pro/
+ */
+
+defined('DATALIFEENGINE') || die('Nope');
+if (!$news_found) return;
+  
+if (preg_match('#\\[(metatags)\\](.+?)\\[/\\1\\]#is', $tpl->result['content'], $simple_meta)) {
+	preg_match_all('#<(.+?)>(.*?)</\\1>#is', $simple_meta[2], $simple_tags);
+	foreach ($simple_tags[1] as $k => $v) {
+		$val = preg_replace('#\s+#is', ' ', $simple_tags[2][$k]);
+		$val = strip_tags($val);
+		$val = trim($val);
+		if (stripos($v, 'og:') === 0) {
+			$v = substr($v, 3);
+			$social_tags[$v] = $val;
+		} elseif ($v != 'title' || !$metatags['header_title']) {
+			$v == 'title' && $v = 'header_title';
+			$metatags[$v] = $val;
+        		if ($v == 'robots' && in_array($val, ['0','no','off','false'])) {
+          			$disable_index = true;
+				unset($metatags[$v]);
+			}
+		}
+	}
+	$tpl->result['content'] = str_replace($simple_meta[0], '', $tpl->result['content']);
+	$tpl->result['content'] = trim($tpl->result['content']);
+}
+",1,0,0,1,"",""
+122,10,engine/inc/addnews.php,after,{$output},"    <div class=""form-group"">
+    <label class=""control-label col-md-2 col-sm-3"">Онлайн-читалка:</label>
+        <div class=""col-md-10 col-sm-9"">
+HTML;
+include_once ENGINE_DIR . '/inc/scrin/api_imgbb.php';
+echo <<<HTML
+			<textarea class=""form-control width-500"" rows=""3"" onkeydown=""checkKey(event, this.form)"" name=""scrin"" id=""scrin"" placeholder=""Введите сообщение""></textarea>
+      </div>
+    </div>",1,0,0,1,"",==
+123,10,engine/inc/addnews.php,after,	$allow_comm = isset( $_POST['allow_comm'] ) ? intval( $_POST['allow_comm'] ) : 0;,	$scrin = $db->safesql( $parse->BB_Parse( $_POST['scrin'] ) );,1,0,0,1,"",==
+124,10,engine/inc/addnews.php,replace,"fixed, allow_br,","fixed, allow_br, scrin,",1,0,0,1,"",==
+125,10,engine/inc/addnews.php,replace,"'$news_fixed', '$allow_br',","'$news_fixed', '$allow_br', '$scrin',",1,0,0,1,"",==
+126,10,engine/inc/editnews.php,after,{$output},"    <div class=""form-group"">
+    <label class=""control-label col-md-2 col-sm-3"">Онлайн-читалка:</label>
+        <div class=""col-md-10 col-sm-9"">
+HTML;
+include_once ENGINE_DIR . '/inc/scrin/api_imgbb.php';
+echo <<<HTML
+			<textarea class=""form-control width-500"" rows=""3"" onkeydown=""checkKey(event, this.form)"" name=""scrin"" id=""scrin"" placeholder=""Введите сообщение"">{$scrines}</textarea>
+      </div>
+    </div>",1,0,0,1,"",==
+127,10,engine/inc/editnews.php,after,	$allow_comm = isset( $_POST['allow_comm'] ) ? intval( $_POST['allow_comm'] ) : 0;,	$scrin = $db->safesql( $parse->BB_Parse( $_POST['scrin'] ) );,1,0,0,1,"",==
+128,10,engine/inc/editnews.php,replace,allow_br='{$allow_br}',"allow_br='{$allow_br}', scrin='{$scrin}'",1,0,0,1,"",==
+129,10,engine/inc/editnews.php,after,"	$row['keywords'] = str_replace(""&amp;"", ""&"", $row['keywords']);","	$scrines = $parse->decodeBBCodes( $row['scrin'], false );",1,0,0,1,"",==
+130,10,engine/modules/show.full.php,before,"$tpl->set( '{short-story}', $row['short_story'] );",include_once ENGINE_DIR . '/modules/scrin.php';,1,0,0,1,"",==
+131,11,engine/ajax/adminfunction.php,before,echo $buffer;,require_once DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/ajax_adminfunction.php');,1,0,0,1,"",""
+132,11,engine/classes/templates.class.php,before,"if (stripos ( $content, ""{catmenu"" ) !== false) {",require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/xcats.php');,1,0,0,1,"",""
+133,11,engine/classes/templates.class.php,after,$category = intval($category_id);,require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/xcats.php');,1,0,0,1,"",""
+134,11,engine/inc/categories.php,before,"$db->query( ""INSERT INTO "" . USERPREFIX . ""_admin_logs (name, date, ip, action, extras) values ('"".$db->safesql($member_id['name']).""', '{$_TIME}', '{$_IP}', '12', '{$cat_name}')"" );",require_once DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/category_action.php');,1,0,0,1,"",""
+135,11,engine/inc/categories.php,after,"$row['fulldescr'] = $parse->decodeBBCodes( $row['fulldescr'], false );",require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/edit_category.php');,1,0,0,1,"",""
+136,11,engine/inc/categories.php,after,"$db->query( ""INSERT INTO "" . USERPREFIX . ""_admin_logs (name, date, ip, action, extras) values ('"".$db->safesql($member_id['name']).""', '{$_TIME}', '{$_IP}', '14', '{$cat_name}')"" );",require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/category_action.php');,1,0,0,1,"",""
+137,11,engine/inc/categories.php,after,$skinlist = SelectSkin( '' );,require DLEPlugins::Check(ENGINE_DIR.'/modules/xcats/admin/includes/add_category.php');,1,0,0,1,"",""
+138,11,engine/inc/categories.php,before,"</div> <div class=""panel-footer""> <button type=""submit"" ",{$output},1,0,0,1,"",""
+139,11,engine/inc/categories.php,before,"</div> <div class=""modal-footer"" style=""margin-top:-20px;""> <button type=""submit"" ",{$output},1,0,0,1,"",""
+140,11,engine/inc/help.php,before,if ( file_exists( DLEPlugins::Check(ROOT_DIR . '/language/' . $selected_language . '/help.lng' )) ) {,require_once DLEPlugins::Check(ENGINE_DIR . '/modules/xcats/admin/includes/ajax_help.php');,1,0,0,1,"",""
