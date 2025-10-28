@@ -4,28 +4,27 @@
 
 ## 1. Исходные CSV и порядок загрузки
 
-Финальные CSV размещены в репозитории в каталоге `data/final` (подкаталог `link_tables` содержит таблицы связей). Загружать их необходимо в строгом порядке, чтобы сохранить внешние ключи и зависимости.
+Финальные CSV размещены в репозитории в каталоге `data/processed/` после выполнения ETL-пайплайна. Загружать их необходимо в строгом порядке, чтобы сохранить внешние ключи и зависимости.
 
 | Шаг | Таблица Supabase (`public.*`) | CSV-файл | Ключевые поля | Зависимости |
 | --- | --- | --- | --- | --- |
-| 1 | `publishers` | `data/final/01_publishers.csv` | `id`, `name`, `country_code`, `founded_year` | — |
-| 2 | `series` | `data/final/02_series.csv` | `id`, `publisher_id`, `title`, `volume`, `start_year`, `end_year` | `publishers`
-| 3 | `contributors` | `data/final/03_contributors.csv` | `id`, `full_name`, `given_name`, `family_name`, `country_code` | — |
-| 4 | `roles` | `data/final/04_roles.csv` | `id`, `slug`, `title` | — |
-| 5 | `issues` | `data/final/10_issues.csv` | `id`, `series_id`, `publisher_id`, `issue_number`, `cover_date`, `price`, `page_count` | `series`, `publishers`
-| 6 | `issue_contributors` | `data/final/link_tables/issue_contributors.csv` | `issue_id`, `contributor_id`, `role_id`, `sequence` | `issues`, `contributors`, `roles`
-| 7 | `issue_publishers` | `data/final/link_tables/issue_publishers.csv` | `issue_id`, `publisher_id`, `imprint` | `issues`, `publishers`
-| 8 | `issue_assets` | `data/final/link_tables/issue_assets.csv` | `issue_id`, `asset_type`, `source_url`, `checksum` | `issues`
-| 9 | `issue_references` | `data/final/link_tables/issue_references.csv` | `issue_id`, `ref_issue_id`, `reference_type` | `issues`
+| 1 | `publishers` | `data/processed/publishers.csv` | `id`, `name`, `slug`, `description`, `created_at`, `active` | — |
+| 2 | `series` | `data/processed/series.csv` | `id`, `publisher_id`, `name`, `slug`, `description`, `created_at`, `active` | `publishers` |
+| 3 | `contributors` | `data/processed/contributors.csv` | `id`, `name`, `dle_user_id`, `email`, `source` | — |
+| 4 | `roles` | `data/processed/roles.csv` | `id`, `name`, `name_en`, `description` | — |
+| 5 | `comic_issues` | `data/processed/comic_issues.csv` | `id`, `series_id`, `title`, `slug`, `issue_number`, `volume`, `description`, `cover_image_url`, `published_date`, `author`, `view_count`, `rating`, `vote_count`, `allow_comments`, `approved` | `series` |
+| 6 | `issue_contributors` | `data/processed/issue_contributors.csv` | `id`, `issue_id`, `contributor_id`, `role_id`, `order` | `comic_issues`, `contributors`, `roles` |
+| 7 | `issue_downloads` | `data/processed/issue_downloads.csv` | `id`, `issue_id`, `link_type`, `url` | `comic_issues` |
+| 8 | `issue_tags` | `data/processed/issue_tags.csv` | `id`, `issue_id`, `tag` | `comic_issues` |
 
-> **Примечание.** Если в каталоге `link_tables` присутствуют дополнительные CSV (например, `issue_stories.csv`, `story_contributors.csv`), импортируйте их после загрузки базовых таблиц, двигаясь от менее зависимых к более зависимым (сначала сущности, затем их связи).
+> **Примечание.** Все CSV-файлы генерируются автоматически ETL-пайплайном из исходных данных DLE. Статистика последнего запуска доступна в файле `ETL_RUN_SUMMARY.md`. Согласно последнему запуску, обработано: 85 издателей, 919 серий, 7,691 выпусков, 649 участников, 25,141 связей участников и 7,700 ссылок на скачивание.
 
 ## 2. Сценарий A: Импорт через Supabase UI
 
 1. Войдите в проект Supabase и откройте раздел **Database → Tables**.
 2. Для первой таблицы (`publishers`) нажмите кнопку **Import data**.
 3. В диалоге импорта:
-   - Загрузите соответствующий CSV-файл из репозитория.
+   - Загрузите соответствующий CSV-файл из локальной копии репозитория (каталог `data/processed/`).
    - Выберите формат **CSV**.
    - Укажите параметры:
      - **Delimiter**: `,`
@@ -35,7 +34,7 @@
      - **Null string**: оставить по умолчанию (пустая строка)
    - Проверьте сопоставление колонок. Все поля CSV должны совпадать с названиями столбцов таблицы.
 4. Запустите импорт и дождитесь подтверждения завершения.
-5. Повторите шаги для остальных таблиц, соблюдая порядок из таблицы выше. Для связывающих таблиц обязательно убедитесь, что внешние ключи (`issue_id`, `contributor_id`, `role_id`, `publisher_id`) сопоставлены корректно.
+5. Повторите шаги для остальных таблиц, соблюдая порядок из таблицы выше. Для связывающих таблиц обязательно убедитесь, что внешние ключи (`issue_id`, `contributor_id`, `role_id`, `series_id`, `publisher_id`) сопоставлены корректно.
 6. После импорта каждой таблицы выполняйте контрольные SELECT-запросы (см. раздел «Проверка данных»), чтобы вовремя отловить проблемы.
 
 ### Рекомендации при работе с UI
@@ -63,46 +62,45 @@ set httpfs.headers = 'User-Agent=SupabaseImport/1.0';
 ```sql
 begin;
 
-copy public.publishers (id, name, country_code, founded_year)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/01_publishers.csv'
+-- Сначала загружаем справочные таблицы
+copy public.publishers (id, name, slug, description, created_at, active)
+from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/publishers.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 
-copy public.series (id, publisher_id, title, volume, start_year, end_year)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/02_series.csv'
+copy public.contributors (id, name, dle_user_id, email, source)
+from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/contributors.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 
-copy public.contributors (id, full_name, given_name, family_name, country_code)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/03_contributors.csv'
+copy public.roles (id, name, name_en, description)
+from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/roles.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 
-copy public.roles (id, slug, title)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/04_roles.csv'
+-- Затем таблицы с зависимостями
+copy public.series (id, publisher_id, name, slug, description, created_at, active)
+from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/series.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 
-copy public.issues (id, series_id, publisher_id, issue_number, cover_date, on_sale_date, price, page_count, synopsis)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/10_issues.csv'
+copy public.comic_issues (id, series_id, title, slug, issue_number, volume, description, cover_image_url, published_date, author, view_count, rating, vote_count, allow_comments, approved)
+from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/comic_issues.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 
-copy public.issue_publishers (issue_id, publisher_id, imprint)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/link_tables/issue_publishers.csv'
+-- И наконец связывающие таблицы
+copy public.issue_contributors (id, issue_id, contributor_id, role_id, "order")
+from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/issue_contributors.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 
-copy public.issue_contributors (issue_id, contributor_id, role_id, sequence, credited_as)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/link_tables/issue_contributors.csv'
+copy public.issue_downloads (id, issue_id, link_type, url)
+from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/issue_downloads.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 
-copy public.issue_assets (issue_id, asset_type, source_url, checksum)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/link_tables/issue_assets.csv'
-with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
-
-copy public.issue_references (issue_id, ref_issue_id, reference_type)
-from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/link_tables/issue_references.csv'
+copy public.issue_tags (id, issue_id, tag)
+from 'https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/issue_tags.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 
 commit;
 ```
 
-3. При необходимости добавьте оставшиеся связывающие таблицы, следуя тому же шаблону `COPY`.
+> **Примечание.** Поле `order` в таблице `issue_contributors` заключено в кавычки, так как является зарезервированным словом SQL. Если в вашей схеме используется другое название поля (например, `display_order` или `sequence`), замените его в запросе.
 
 ### 3.2 Загрузка через Supabase Storage (резервный вариант)
 
@@ -119,16 +117,16 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '{
     "bucketId": "etl-staging",
-    "objectName": "final/01_publishers.csv",
-    "source": "https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/final/01_publishers.csv"
+    "objectName": "processed/publishers.csv",
+    "source": "https://raw.githubusercontent.com/yaroslav-zonov/CTO/main/data/processed/publishers.csv"
   }'
 ```
 
 3. Получите публичную ссылку на загруженный объект (в UI или через API) и выполните импорт:
 
 ```sql
-copy public.publishers (id, name, country_code, founded_year)
-from 'https://<PROJECT_ID>.supabase.co/storage/v1/object/public/etl-staging/final/01_publishers.csv'
+copy public.publishers (id, name, slug, description, created_at, active)
+from 'https://<PROJECT_ID>.supabase.co/storage/v1/object/public/etl-staging/processed/publishers.csv'
 with (format csv, header true, delimiter ',', quote '"', encoding 'UTF8');
 ```
 
@@ -149,18 +147,24 @@ select 'contributors', count(*) from public.contributors
 union all
 select 'roles', count(*) from public.roles
 union all
-select 'issues', count(*) from public.issues
+select 'comic_issues', count(*) from public.comic_issues
 union all
 select 'issue_contributors', count(*) from public.issue_contributors
 union all
-select 'issue_publishers', count(*) from public.issue_publishers
+select 'issue_downloads', count(*) from public.issue_downloads
 union all
-select 'issue_assets', count(*) from public.issue_assets
-union all
-select 'issue_references', count(*) from public.issue_references;
+select 'issue_tags', count(*) from public.issue_tags;
 ```
 
-Сравните полученные значения с отчётом ETL (см. раздел 6) либо с ожидаемыми цифрами, указанными в спецификации выгрузки.
+Сравните полученные значения с отчётом ETL (см. раздел 6). Согласно последнему запуску ETL (28.10.2025), ожидаемые значения:
+- `publishers`: 85 записей
+- `series`: 919 записей
+- `contributors`: 649 записей
+- `roles`: 6 записей
+- `comic_issues`: 7,691 записей
+- `issue_contributors`: 25,141 записей
+- `issue_downloads`: 7,700 записей
+- `issue_tags`: 43 записей
 
 ### 4.2 Проверка внешних ключей и обязательных полей
 
@@ -171,24 +175,34 @@ from public.series s
 left join public.publishers p on p.id = s.publisher_id
 where p.id is null;
 
--- Выпуски без серии или издателя
+-- Выпуски без серии (согласно ETL-отчёту, ожидается ~39 записей без series_id)
 select count(*)
-from public.issues i
-left join public.series s on s.id = i.series_id
-left join public.publishers p on p.id = i.publisher_id
-where s.id is null or p.id is null;
+from public.comic_issues i
+where i.series_id is null;
 
--- Присвоения ролей без контрибьюторов/ролей/выпусков
+-- Выпуски с series_id, но серия не существует в таблице series (должно быть 0)
+select count(*)
+from public.comic_issues i
+left join public.series s on s.id = i.series_id
+where i.series_id is not null and s.id is null;
+
+-- Связи выпусков с участниками без контрибьюторов/ролей/выпусков (должно быть 0)
 select count(*)
 from public.issue_contributors ic
-left join public.issues i on i.id = ic.issue_id
+left join public.comic_issues i on i.id = ic.issue_id
 left join public.contributors c on c.id = ic.contributor_id
 left join public.roles r on r.id = ic.role_id
 where i.id is null or c.id is null or r.id is null;
 
--- Обязательные поля (пример: номер выпуска и дата выхода)
-select count(*) from public.issues where issue_number is null;
-select count(*) from public.issues where cover_date is null;
+-- Ссылки на скачивание без выпусков (должно быть 0)
+select count(*)
+from public.issue_downloads d
+left join public.comic_issues i on i.id = d.issue_id
+where i.id is null;
+
+-- Обязательные поля
+select count(*) as issues_without_title from public.comic_issues where title is null or title = '';
+select count(*) as issues_without_slug from public.comic_issues where slug is null or slug = '';
 ```
 
 ### 4.3 Проверка уникальности и дубликатов
@@ -198,6 +212,18 @@ select count(*) from public.issues where cover_date is null;
 select name, count(*)
 from public.publishers
 group by name
+having count(*) > 1;
+
+-- Поиск дублей серий по slug
+select slug, count(*)
+from public.series
+group by slug
+having count(*) > 1;
+
+-- Поиск дублей выпусков по slug
+select slug, count(*)
+from public.comic_issues
+group by slug
 having count(*) > 1;
 
 -- Дублирующие связи выпуск ↔ контрибьютор ↔ роль
@@ -217,15 +243,17 @@ having count(*) > 1;
 
 ```sql
 begin;
-truncate table public.issue_references restart identity cascade;
-truncate table public.issue_assets restart identity cascade;
+-- Сначала очищаем связывающие таблицы
+truncate table public.issue_tags restart identity cascade;
+truncate table public.issue_downloads restart identity cascade;
 truncate table public.issue_contributors restart identity cascade;
-truncate table public.issue_publishers restart identity cascade;
-truncate table public.issues restart identity cascade;
-truncate table public.roles restart identity cascade;
-truncate table public.contributors restart identity cascade;
+-- Затем основные таблицы с зависимостями
+truncate table public.comic_issues restart identity cascade;
 truncate table public.series restart identity cascade;
+-- И наконец независимые справочники
 truncate table public.publishers restart identity cascade;
+truncate table public.contributors restart identity cascade;
+truncate table public.roles restart identity cascade;
 commit;
 ```
 
@@ -235,18 +263,19 @@ commit;
 
 Для регулярных обновлений рекомендуется использовать временную схему `stg`:
 
-1. Создайте временные таблицы с той же структурой (`create schema if not exists stg;` + `create table stg.publishers (...) like public.publishers including all;`).
+1. Создайте временные таблицы с той же структурой (`create schema if not exists stg;` + `create table stg.publishers (like public.publishers including all);`).
 2. Загружайте CSV в staging (`copy stg.publishers from ...`).
 3. Обновляйте боевые таблицы через `insert ... on conflict do update`, сохраняя историю изменений:
 
 ```sql
-insert into public.publishers as tgt (id, name, country_code, founded_year)
-select id, name, country_code, founded_year
+insert into public.publishers as tgt (id, name, slug, description, created_at, active)
+select id, name, slug, description, created_at, active
 from stg.publishers
 on conflict (id) do update
 set name = excluded.name,
-    country_code = excluded.country_code,
-    founded_year = excluded.founded_year;
+    slug = excluded.slug,
+    description = excluded.description,
+    active = excluded.active;
 
 truncate table stg.publishers;
 ```
@@ -255,17 +284,55 @@ truncate table stg.publishers;
 
 ## 6. Логи и контроль качества ETL
 
-- Автоматический ETL сохраняет отчёты и критичные расхождения в Supabase Storage, бакет `etl-monitoring`, файл `reports/latest_run.json`. Прямая ссылка: `https://<PROJECT_ID>.supabase.co/storage/v1/object/public/etl-monitoring/reports/latest_run.json`.
-- В отчёте содержатся контрольные суммы строк по каждой таблице, количество добавленных/обновлённых записей и перечень записей с незаполненными критичными атрибутами.
-- Для просмотра из UI откройте **Storage → etl-monitoring → reports → latest_run.json**. Файл можно скачать и сравнить с результатами SQL-проверок.
+ETL-пайплайн генерирует детальные логи и отчёты о качестве данных, которые хранятся локально в каталоге `logs/` проекта:
+
+- **Краткая сводка**: `ETL_RUN_SUMMARY.md` - содержит общую статистику последнего запуска ETL (количество записей, время выполнения, статус проверок)
+- **Детальный отчёт**: `logs/etl_report.md` - подробная информация о качестве данных, предупреждения и рекомендации
+- **Лог выполнения**: `logs/etl_YYYYMMDD_HHMMSS.log` - технический лог с подробностями обработки каждого этапа
+
+### Ключевые метрики из последнего запуска ETL
+
+Согласно `ETL_RUN_SUMMARY.md`:
+- ✅ Все проверки целостности пройдены
+- ✅ Референсная целостность (foreign keys) валидна
+- ⚠️ 39 выпусков без связи с сериями (некритично, можно исправить вручную)
+- ⚠️ 1,073 выпусков с пустыми описаниями (в исходных данных не было)
+- ℹ️ 499 участников не сопоставлены с пользователями DLE (нормально для псевдонимов)
 
 ### Действия при обнаружении несоответствий
 
 1. Зафиксируйте проблему в тикете (описание, таблица, идентификаторы записей).
-2. Сверьте данные с исходным CSV (через GitHub history или storage-бакет) и определите, связано ли отклонение с самим источником.
-3. При необходимости повторно выполните ETL-процесс или ручную загрузку затронутых таблиц (используйте `TRUNCATE` + импорт либо сценарием staging).
-4. Обновите `latest_run.json` повторным прогоном ETL и убедитесь, что контрольные суммы совпадают.
+2. Проверьте детальный отчёт в `logs/etl_report.md` для получения контекста.
+3. Сверьте данные с исходными CSV-файлами DLE (в корне проекта, файлы `dle_*.csv`).
+4. При необходимости:
+   - Исправьте исходные данные
+   - Повторно запустите ETL: `python run_etl.py`
+   - Повторите импорт обновлённых CSV в Supabase
+5. Для точечных исправлений используйте SQL UPDATE запросы напрямую в Supabase.
+
+### Повторный запуск ETL
+
+Если требуется пересоздать CSV-файлы из исходных данных:
+
+```bash
+# Активируйте виртуальное окружение (если используется)
+source venv/bin/activate
+
+# Запустите ETL-пайплайн
+python run_etl.py
+
+# Проверьте результаты
+cat ETL_RUN_SUMMARY.md
+cat logs/etl_report.md
+```
+
+После успешного запуска обновлённые CSV будут в каталоге `data/processed/`.
 
 ---
 
-При возникновении вопросов по структуре таблиц или миграциям обращайтесь к разделу архитектурной документации проекта. Для автоматизации импорта рекомендовано перенести команды из сценария B в SQL-скрипт и использовать cron-задачи Supabase (pg_cron).
+**Дополнительная документация:**
+- Структура целевых таблиц: `docs/target_schema.md`
+- Общая информация о проекте: `README.md`
+- История изменений: `CHANGELOG.md`
+
+Для автоматизации импорта рекомендовано перенести команды из сценария B (раздел 3.1) в SQL-скрипт и использовать cron-задачи Supabase (pg_cron).
