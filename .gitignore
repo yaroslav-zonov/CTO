@@ -92,6 +92,7 @@ yarn-error.log*
 # ETL specific
 data/raw/*
 data/processed/*
+!data/processed/*.csv
 logs/*.log
 logs/*.txt
 
