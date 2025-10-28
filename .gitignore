@@ -1,6 +1,8 @@
 # OS artifacts
 .DS_Store
 Thumbs.db
+.AppleDouble
+.LSOverride
 
 # Python
 __pycache__/
@@ -27,6 +29,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Virtual environments
 venv/
@@ -34,13 +40,19 @@ ENV/
 env/
 .venv
 .env/
+env.bak/
+venv.bak/
 
 # Node.js
 node_modules/
+package-lock.json
+yarn.lock
 
 # Environments
 .env
 .env.*
+.env.local
+.env.*.local
 *.env
 .envrc
 
@@ -50,6 +62,12 @@ node_modules/
 *.swp
 *.swo
 *~
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
 
 # Packaging / build artifacts
 coverage/
@@ -57,12 +75,36 @@ coverage/
 # Logs and reports
 *.log
 *.tmp
+*.temp
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Supabase
+.supabase/
 
 # ETL specific
 data/raw/*
 data/processed/*
 logs/*.log
 logs/*.txt
+
+# Output files
+output/
+processed/
+*.csv.bak
+*.csv.tmp
+
+# Temporary files
+tmp/
+temp/
+*.bak
 
 # Keep directory structure
 !data/raw/.gitkeep
@@ -71,3 +113,23 @@ logs/*.txt
 
 # Keep reports
 !logs/*.md
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre
+.pyre/
