@@ -1,0 +1,30 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Node.js
+node_modules/
+
+# Environments
+.env
+.env.*
+*.env
+.envrc
+
+# Packaging / build artifacts
+dist/
+build/
+coverage/
+
+# Logs and reports
+*.log
+*.tmp
+
+# Virtual environments
+venv/
+.env/
