@@ -1,7 +1,12 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 *.so
 .Python
 build/
@@ -28,6 +33,16 @@ venv/
 ENV/
 env/
 .venv
+.env/
+
+# Node.js
+node_modules/
+
+# Environments
+.env
+.env.*
+*.env
+.envrc
 
 # IDE
 .vscode/
@@ -35,7 +50,13 @@ env/
 *.swp
 *.swo
 *~
-.DS_Store
+
+# Packaging / build artifacts
+coverage/
+
+# Logs and reports
+*.log
+*.tmp
 
 # ETL specific
 data/raw/*
