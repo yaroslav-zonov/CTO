@@ -1,12 +1,31 @@
-# ETL Pipeline для обработки данных DLE комиксов
+# RPU Comics Platform - DLE Migration & Modern Theme
 
-Этот проект содержит ETL пайплайн для автоматизации извлечения, очистки и нормализации данных из CSV экспортов DataLife Engine (DLE) в набор готовых к импорту CSV файлов.
+Этот проект включает:
+
+1. **ETL Pipeline** - Автоматизация извлечения, очистки и нормализации данных из CSV экспортов DataLife Engine (DLE)
+2. **Modern DLE Theme** - Современная тема с Tailwind CSS, vanilla JavaScript и современным дизайном
 
 ## Структура проекта
 
 ```
 .
-├── etl/                      # Модули ETL пайплайна
+├── DLE TPL/                 # 🎨 Современная DLE тема
+│   ├── *.tpl                # Template файлы
+│   ├── package.json         # Build конфигурация
+│   ├── tailwind.config.js   # Tailwind настройки
+│   ├── src/                 # Исходники для сборки
+│   │   └── input.css        # Главный CSS файл
+│   ├── style/               # Стили
+│   │   ├── styles.css       # Скомпилированный CSS (generated)
+│   │   ├── fonts.css        # Импорты шрифтов
+│   │   ├── components.css   # Компонентные стили
+│   │   └── engine.css       # DLE стили
+│   ├── js/
+│   │   ├── theme.js         # ✅ Современный vanilla JS
+│   │   └── libs.js          # ❌ Устаревший jQuery
+│   ├── images/              # Медиа-ресурсы
+│   └── fonts/               # Файлы шрифтов
+├── etl/                     # 📊 Модули ETL пайплайна
 │   ├── extract/             # Загрузка исходных данных
 │   ├── transform/           # Преобразование данных
 │   ├── load/                # Сохранение результатов
@@ -15,23 +34,49 @@
 │   ├── pipeline.py          # Основной пайплайн
 │   └── quality.py           # Валидация качества
 ├── data/
-│   ├── raw/                 # Исходные данные (не используется, CSV в корне)
+│   ├── raw/                 # Исходные данные
 │   └── processed/           # Результаты обработки
-├── logs/                     # Логи выполнения и отчёты
-├── docs/                     # Документация
-│   └── target_schema.md     # Описание целевой схемы
-├── run_etl.py               # Точка входа
-└── requirements.txt         # Зависимости Python
+├── docs/                    # 📚 Документация
+│   ├── asset-build.md       # Руководство по сборке ресурсов
+│   ├── integration-guide.md # Гайд по интеграции
+│   └── target_schema.md     # Целевая схема данных
+├── logs/                    # Логи выполнения и отчёты
+├── run_etl.py              # Точка входа ETL
+└── requirements.txt        # Зависимости Python
 ```
 
-## Установка
+## Быстрый старт
 
-### Требования
+### Для разработчиков темы
+
+1. **Установка зависимостей для сборки темы:**
+   ```bash
+   cd "DLE TPL"
+   npm install
+   ```
+
+2. **Сборка CSS:**
+   ```bash
+   npm run build:css
+   ```
+
+3. **Режим разработки (авто-пересборка):**
+   ```bash
+   npm run dev
+   ```
+
+📖 **Документация:**
+- [Asset Build Guide](docs/asset-build.md) - Как собирать ресурсы
+- [Integration Guide](docs/integration-guide.md) - Как использовать в шаблонах
+
+### Для ETL Pipeline
+
+#### Требования
 
 - Python 3.8 или выше
 - pip
 
-### Установка зависимостей
+#### Установка зависимостей
 
 ```bash
 pip install -r requirements.txt
@@ -197,6 +242,35 @@ ROLE_MAPPINGS = {
 ### Добавление новой проверки качества
 
 Добавьте метод в класс `QualityReport` в `etl/quality.py`.
+
+## Modern DLE Theme Features
+
+✅ **Современный CSS** - Tailwind CSS с utility-first подходом  
+✅ **Без jQuery** - Чистый vanilla JavaScript для лучшей производительности  
+✅ **Адаптивный дизайн** - Mobile-first, работает на всех устройствах  
+✅ **Современная типографика** - Шрифт Inter  
+✅ **Система иконок** - Material Symbols для консистентной иконографии  
+✅ **Design Tokens** - CSS custom properties для легкой кастомизации  
+✅ **Обратная совместимость** - Работает с существующим функционалом DLE  
+✅ **Быстрая загрузка** - Оптимизированные и минифицированные ресурсы  
+
+### Интерактивные возможности
+
+- Раскрывающийся поиск
+- Мобильное меню
+- Выпадающие меню
+- Переключение вкладок
+- Карусели
+- AJAX рейтинг
+- Переключение видов (сетка/список)
+- Кнопка "Наверх"
+
+### Документация темы
+
+- **[README темы](DLE TPL/README.md)** - Обзор темы
+- **[CHANGELOG](DLE TPL/CHANGELOG.md)** - История изменений
+- **[Asset Build Guide](docs/asset-build.md)** - Процесс сборки ресурсов
+- **[Integration Guide](docs/integration-guide.md)** - Руководство по интеграции
 
 ## Лицензия
 

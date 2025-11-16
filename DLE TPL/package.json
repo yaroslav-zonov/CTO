@@ -1,0 +1,13 @@
+{
+  "name": "dle-theme-rpu",
+  "version": "1.0.0",
+  "description": "Modern DLE theme with Tailwind CSS",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/input.css -o ./style/styles.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./style/styles.css --watch",
+    "dev": "npm run watch:css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}
