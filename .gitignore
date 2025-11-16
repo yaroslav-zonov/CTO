@@ -3,6 +3,7 @@
 Thumbs.db
 .AppleDouble
 .LSOverride
+__MACOSX/
 
 # Python
 __pycache__/
