@@ -1,0 +1,108 @@
+/* Modern offline page styling */
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Inter Variable', 'Open Sans', sans-serif;
+	color: #212121;
+	background: linear-gradient(135deg, #fdf2f0 0%, #f7f8ff 100%);
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+}
+
+.offline-container {
+	width: 100%;
+	max-width: 640px;
+}
+
+.offline-card {
+	background: #ffffff;
+	border-radius: 24px;
+	box-shadow: 0 24px 60px -30px rgba(15, 23, 42, 0.4);
+	padding: 48px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 24px;
+}
+
+.offline-icon {
+	width: 80px;
+	height: 80px;
+	border-radius: 20px;
+	background: rgba(252, 86, 33, 0.12);
+	color: #fc5621;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.offline-title {
+	font-size: 32px;
+	font-weight: 800;
+	line-height: 1.2;
+	text-align: center;
+}
+
+.offline-subtitle {
+	font-size: 18px;
+	line-height: 28px;
+	text-align: center;
+	color: rgba(33, 33, 33, 0.7);
+	margin-bottom: 8px;
+}
+
+.offline-message {
+	width: 100%;
+	background: rgba(33, 33, 33, 0.04);
+	border: 1px solid rgba(33, 33, 33, 0.1);
+	border-radius: 16px;
+	padding: 24px;
+	font-size: 16px;
+	line-height: 26px;
+	color: #212121;
+}
+
+.offline-message p + p {
+	margin-top: 12px;
+}
+
+.offline-message a {
+	color: #fc5621;
+	text-decoration: underline;
+}
+
+.offline-message a:hover {
+	text-decoration: none;
+}
+
+.offline-footer {
+	font-size: 16px;
+	color: rgba(33, 33, 33, 0.7);
+	text-align: center;
+}
+
+@media (max-width: 600px) {
+	body {
+		padding: 16px;
+	}
+
+	.offline-card {
+		padding: 32px 24px;
+	}
+
+	.offline-title {
+		font-size: 26px;
+	}
+
+	.offline-subtitle {
+		font-size: 16px;
+	}
+}

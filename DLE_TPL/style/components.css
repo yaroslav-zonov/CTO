@@ -1,0 +1,163 @@
+/* ===== RPU COMPONENTS CSS ===== */
+/* Additional component styles for RPU template */
+
+/* Issue Card Component Enhancements */
+.comic-item {
+  cursor: pointer;
+}
+
+.comic-item .comic-link {
+  position: relative;
+}
+
+.comic-item .comic-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.comic-item:hover .comic-cover::after {
+  opacity: 1;
+}
+
+/* Collection Card Component Enhancements */
+.collection {
+  cursor: pointer;
+}
+
+.collection-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.collection:hover .collection-cover::after {
+  opacity: 1;
+}
+
+/* Series Card Component Enhancements */
+.series-item {
+  cursor: pointer;
+}
+
+.series-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.series-item:hover .series-cover::after {
+  opacity: 1;
+}
+
+/* Loading States */
+.comic-item.loading,
+.collection.loading,
+.series-item.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.comic-cover.loading,
+.collection-cover.loading,
+.series-cover.loading {
+  background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 50%, #f0f0f0 100%);
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Empty States */
+.comics-grid:empty::after,
+.collections-grid:empty::after,
+.series-grid:empty::after {
+  content: 'Контент скоро появится';
+  display: block;
+  width: 100%;
+  padding: 48px;
+  text-align: center;
+  color: rgba(33, 33, 33, 0.4);
+  font-size: 16px;
+  font-weight: 400;
+  font-family: 'Inter Variable', sans-serif;
+}
+
+/* Accessibility */
+.comic-link:focus,
+.collection-link:focus,
+.series-link:focus {
+  outline: 2px solid #fc5621;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Print Styles */
+@media print {
+  .top-navigation,
+  .site-footer {
+    display: none;
+  }
+  
+  .comic-item,
+  .collection,
+  .series-item {
+    break-inside: avoid;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .comic-title,
+  .collection-title,
+  .series-title {
+    font-weight: 600;
+  }
+  
+  .comic-cover,
+  .collection-cover,
+  .series-cover {
+    border: 1px solid #212121;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .comic-item,
+  .collection,
+  .series-item {
+    transition: none;
+  }
+  
+  .cover-img,
+  .collection-img,
+  .series-img {
+    transition: none;
+  }
+  
+  .comic-item:hover,
+  .collection:hover,
+  .series-item:hover {
+    transform: none;
+  }
+  
+  .comic-item:hover .cover-img {
+    transform: none;
+  }
+}
