@@ -1,0 +1,1 @@
+<span class="fas fa-circle" title="Статус" style="color:#1bfb00"></span>
