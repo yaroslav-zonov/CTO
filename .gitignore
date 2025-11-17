@@ -48,6 +48,10 @@ venv.bak/
 node_modules/
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
+
+# Mac OS
+__MACOSX/
 
 # Environments
 .env
@@ -135,3 +139,7 @@ dmypy.json
 
 # Pyre
 .pyre/
+
+# Project specific
+RPU PRJ.zip
+design/
