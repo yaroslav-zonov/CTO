@@ -11,3 +11,9 @@
         <p class="font-normal text-sm leading-4 text-foreground transition-opacity group-hover:opacity-90">{title limit="80"}</p>
     </a>
 </article>
+<a class="mov-side" href="{full-link}">
+	<div class="mov-side-img img-box">
+		<img src="{image-1}" alt="{title}" />
+	</div>
+	<div class="mov-side-title">{title limit="80"}</div>
+</a>
