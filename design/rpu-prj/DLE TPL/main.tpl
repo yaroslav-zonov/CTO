@@ -27,19 +27,19 @@
           <div class="icon"></div>
         </button>
                     <form id="quicksearch" method="post">
-					<input type="hidden" name="do" value="search" />
+                    <input type="hidden" name="do" value="search" />
                     <input type="hidden" name="catlist[]" value="" />
-					<input type="hidden" name="subaction" value="search" />
-					<div class="search-inner">
-						<input id="story" name="story" placeholder="Введите название комикса на английском..." type="text" />
-						<button type="submit" title="Найти"><span class="fa fa-search"></span></button>
-					</div>
-				</form>
+                    <input type="hidden" name="subaction" value="search" />
+                    <div class="search-inner">
+                        <input id="story" name="story" placeholder="Введите название комикса на английском..." type="text" />
+                        <button type="submit" title="Найти"><span class="fa fa-search"></span></button>
+                    </div>
+                </form>
         <button class="nav-icon">
           <div class="icon"></div>
         </button>
         <div class="show-login avatar" id="loginbtn">
-       	  <span class="fa fa-user"></span>
+             <span class="fa fa-user"></span>
         </div>
       </div>
     </header>
@@ -135,21 +135,17 @@
         </div>
       </section>
         
-	  <section class="section">
+      <section class="section">
         <h2 class="section-title underlined">Новинки DC</h2>
         <div class="items-grid" data-type="7 Issues">
-        <div class="items-grid" data-type="7 Issues">
           {custom category="2" subcat="yes" order="date" template="shortstory-main" from="0" limit="7" sort="desc"}
-        </div>
         </div>
       </section>
       
       <section class="section">
         <h2 class="section-title underlined">Популярное за месяц</h2>
         <div class="items-grid" data-type="5 Issues">
-        <div class="items-grid" data-type="5 Issues">
           {custom order="reads" days="30" template="shortstory-main" from="0" limit="5" sort="desc"}
-        </div>
         </div>
       </section>
 
@@ -213,21 +209,17 @@
         </div>
       </section>
         
-	  <section class="section">
+      <section class="section">
         <h2 class="section-title underlined">Новинки других издательств</h2>
-        <div class="items-grid" data-type="7 Issues">
         <div class="items-grid" data-type="7 Issues">
           {custom categoryexclude="1,2" subcat="yes" order="date" template="shortstory-main" from="0" limit="7" sort="desc"}
         </div>
-        </div>
       </section>        
 
-	  <section class="section">
+      <section class="section">
         <h2 class="section-title underlined">Популярные ваншоты</h2>
         <div class="items-grid" data-type="5 Issues">
-        <div class="items-grid" data-type="5 Issues">
           {custom order="reads" xfields="Одиночный выпуск" template="shortstory-main" from="0" limit="5" sort="desc"}
-        </div>
         </div>
       </section> 
 
